@@ -8,38 +8,46 @@ import it.unibo.inner.api.Predicate;
 public class ImplementationIterableWithPolicy<T> implements IterableWithPolicy<T>{
     
     private final T array[];
+    private Predicate<T> filter;
+
+    public ImplementationIterableWithPolicy(T array[]) {
+        this(array, item -> true);
+    }
+
+    public ImplementationIterableWithPolicy(T array[], Predicate<T> filter) {
+        this.array = array;
+        this.filter = filter;
+    }
     
     @Override
     public void setIterationPolicy(Predicate<T> filter) {
-        // Empty (for now)
+        this.filter = filter;
     }
 
     private class PolicyIterator implements Iterator<T> {
 
-        private int cursor = 0;
+        private int cursor = -1;
 
         @Override
         public boolean hasNext() {
-            return cursor < array.length;
+            while ((cursor + 1) < array.length && !filter.test(array[cursor + 1])) {
+                cursor++;
+            }
+            return (cursor + 1) < array.length;
         }
 
         @Override
         public T next() {
-            if (hasNext()) {
-                T element = array[cursor];
-                cursor++;
-                return element;
+            while (!hasNext()) {
+                throw new java.util.NoSuchElementException();
             }
-            return null;
+            cursor++;
+            return array[cursor];
         }
     }
 
     @Override
     public Iterator<T> iterator() {
         return new PolicyIterator();
-    }
-
-    public ImplementationIterableWithPolicy(T array[]) {
-        this.array = array;
     }
 }
