@@ -54,7 +54,12 @@ public final class Transformers {
      * @return A transformed list where each input element is replaced with the produced elements
      */
     public static <I, O> List<O> transform(final Iterable<I> base, final Function<I, O> transformer) {
-        return null;
+        return flattenTransform(base, new Function<I, Collection<? extends O>>() {
+            @Override
+            public Collection<? extends O> call(final I input) {
+                return List.of(transformer.call(input));
+            }
+        });
     }
 
     /**
@@ -70,7 +75,7 @@ public final class Transformers {
      * @return A flattened list with the elements of each collection in the input
      */
     public static <I> List<? extends I> flatten(final Iterable<? extends Collection<? extends I>> base) {
-        return null;
+        return flattenTransform(base, Function.identity());
     }
 
     /**
@@ -87,7 +92,15 @@ public final class Transformers {
      * @return A list containing only the elements that passed the test
      */
     public static <I> List<I> select(final Iterable<I> base, final Function<I, Boolean> test) {
-        return null;
+        return flattenTransform(base, new Function<I, Collection<I>>() {
+            @Override
+            public Collection<I> call(final I input) {
+                if (test.call(input)) {
+                    return List.of(input);
+                }
+                return List.of();
+            }
+        });
     }
 
     /**
@@ -103,6 +116,14 @@ public final class Transformers {
      * @return A list containing only the elements that passed the test
      */
     public static <I> List<I> reject(final Iterable<I> base, final Function<I, Boolean> test) {
-        return null;
+        return select(base, new Function<I, Boolean>() {
+            @Override
+            public Boolean call(final I input) {
+                if (test.call(input)) {
+                    return false;
+                }
+                return true;
+            }
+        });
     }
 }
