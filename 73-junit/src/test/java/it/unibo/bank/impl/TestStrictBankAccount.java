@@ -10,6 +10,7 @@ import static it.unibo.bank.impl.StrictBankAccount.TRANSACTION_FEE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.fail;
 
 /**
  * Test class for the {@link StrictBankAccount} class.
@@ -61,6 +62,7 @@ class TestStrictBankAccount {
     public void testNegativeWithdraw() {
         try {
             bankAccount.withdraw(mRossi.getUserID(), NEGATIVE_AMOUNT);
+            fail("Withdrawing a negative amount was possible, but should have thrown an exception");
         } catch (final IllegalArgumentException e) {
             assertEquals(0.0, bankAccount.getBalance());
             assertNotNull(e.getMessage());
@@ -75,6 +77,7 @@ class TestStrictBankAccount {
     public void testWithdrawingTooMuch() {
         try {
             bankAccount.withdraw(mRossi.getUserID(), AMOUNT);
+            fail("Withdrawing more money than the current balance was possible, but should have thrown an exception");
         } catch (final IllegalArgumentException e) {
             assertEquals(0.0, bankAccount.getBalance());
             assertNotNull(e.getMessage());
